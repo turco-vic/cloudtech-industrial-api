@@ -24,6 +24,10 @@ class MaquinaControllersTest {
             {"nome":"Máquina CNC 01","tipo":"CNC","setor":"Usinagem","status":"em operação"}
             """;
 
+    private static final String PRODUCAO_JSON = """
+            {"maquinaId":1,"consumoKw":12.5,"horarioAcionamento":"08:30","pecasProduzidas":150}
+            """;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -113,6 +117,34 @@ class MaquinaControllersTest {
     void excluirMaquinaInexistenteRetorna404() throws Exception {
         mockMvc.perform(delete("/maquinas/99"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void registrarProducaoRetorna201() throws Exception {
+        mockMvc.perform(post("/producao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(PRODUCAO_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.maquinaId").value(1))
+                .andExpect(jsonPath("$.consumoKw").value(12.5))
+                .andExpect(jsonPath("$.horarioAcionamento").value("08:30"))
+                .andExpect(jsonPath("$.pecasProduzidas").value(150));
+    }
+
+    @Test
+    void listarProducaoRetornaHistorico() throws Exception {
+        mockMvc.perform(post("/producao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(PRODUCAO_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/producao"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].maquinaId").value(1))
+                .andExpect(jsonPath("$[0].consumoKw").value(12.5))
+                .andExpect(jsonPath("$[0].horarioAcionamento").value("08:30"))
+                .andExpect(jsonPath("$[0].pecasProduzidas").value(150));
     }
 
     private void cadastrarMaquina() throws Exception {
