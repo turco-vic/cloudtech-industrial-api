@@ -1,6 +1,7 @@
 package com.cloudtech.monitoramento.controller;
 
 import com.cloudtech.monitoramento.models.Maquinas;
+import com.cloudtech.monitoramento.models.Producao;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,13 +13,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class MaquinaControllers {
 
     private List<Maquinas> maquinas = new ArrayList<>();
+    private List<Producao> producoes = new ArrayList<>();
     private long proximoId = 1;
+
+    @GetMapping("/")
+    public Map<String, String> paginaInicial() {
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", "Bem-vindo ao sistema de monitoramento de máquinas industriais da CloudTech Solutions");
+        return resposta;
+    }
+
+    @GetMapping("/status")
+    public Map<String, String> status() {
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("status", "online");
+        resposta.put("mensagem", "Aplicação de monitoramento em execução");
+        return resposta;
+    }
+
+    @GetMapping("/versao")
+    public Map<String, String> versao() {
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("versao", "1.0.0");
+        return resposta;
+    }
 
     @GetMapping("/maquinas")
     public List<Maquinas> listarMaquinas() {
@@ -56,5 +82,16 @@ public class MaquinaControllers {
             }
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/producao")
+    public List<Producao> listarProducao() {
+        return producoes;
+    }
+
+    @PostMapping("/producao")
+    public ResponseEntity<Producao> registrarProducao(@RequestBody Producao producao) {
+        producoes.add(producao);
+        return ResponseEntity.status(HttpStatus.CREATED).body(producao);
     }
 }
