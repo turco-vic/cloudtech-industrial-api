@@ -1,6 +1,7 @@
 package com.cloudtech.monitoramento.controller;
 
 import com.cloudtech.monitoramento.models.Maquinas;
+import com.cloudtech.monitoramento.models.Producao;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MaquinaControllers {
 
     private List<Maquinas> maquinas = new ArrayList<>();
+    private List<Producao> producoes = new ArrayList<>();
     private long proximoId = 1;
 
     @GetMapping("/maquinas")
@@ -56,5 +58,16 @@ public class MaquinaControllers {
             }
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/producao")
+    public List<Producao> listarProducao() {
+        return producoes;
+    }
+
+    @PostMapping("/producao")
+    public ResponseEntity<Producao> registrarProducao(@RequestBody Producao producao) {
+        producoes.add(producao);
+        return ResponseEntity.status(HttpStatus.CREATED).body(producao);
     }
 }
